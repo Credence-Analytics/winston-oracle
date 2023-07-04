@@ -60,7 +60,7 @@ module.exports = class OracleTransport extends Transport {
                 //set log object
                 const log = {};
                 log[this.fields.level] = level;
-                log[this.fields.message] = Buffer.from(message + "").toString();
+                log[this.fields.message] = Buffer.from(message + "").toString().substring(0, 4000);
                 log[this.fields.source] = this.options.source;
 
                 connection = await this.pool.getConnection();
