@@ -1,6 +1,6 @@
 {
   "name": "@credenceanalytics/winston-oracle",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Oracle transport plugin for winston@3.x logger",
   "main": "index.js",
   "bugs": "https://github.com/Credence-Analytics/winston-oracle/issues",
