@@ -1,10 +1,12 @@
 const winston = require('winston');
 const oracledb = require('oracledb');
+const fs = require('fs');
+const path = require('path');
 const expect = require('chai').expect;
-const OracleTransport = require('../index');
+const OracleTransport = require(path.join(__dirname, '..', 'index.js'));
 let WINSTON_ORACLE_CONFIG = {};
 try {
-    WINSTON_ORACLE_CONFIG = require('../config.json');
+    WINSTON_ORACLE_CONFIG = require(path.join(__dirname, '..', 'config.json'));
 } catch (error) {
     throw new Error(`Config file required to run test! Create config file using \`config.json.example\``);
 }
@@ -54,7 +56,7 @@ after('Closing connection', async function () {
  * To run the test case you will require [winston@3.1.0]{@link https://www.npmjs.com/package/winston} package and [oracledb@5.2.0]{@link https://www.npmjs.com/package/oracledb} package
  */
 describe('Test oracle transport for winston', async function () {
-    it('always pass', async function () {
+    it('Success scenario', async function () {
         function logMsg(logger) {
             return function (msg) {
                 Object.keys(levels).forEach(function (level) {
@@ -69,7 +71,11 @@ describe('Test oracle transport for winston', async function () {
                 level: test_log_level,
                 format: winston.format.json(),
                 transports: [
-                    new winston.transports.Console({ format: winston.format.simple(), }),
+                    new winston.transports.Console({ 
+                        handleExceptions: true,
+                        handleRejections: true,
+                        format: winston.format.simple()
+                    }),
                     new OracleTransport({ pool: dbpool, table: "SYS_LOGS", source: "winston-oracle-testing" })
                 ]
             });
@@ -88,7 +94,8 @@ describe('Test oracle transport for winston', async function () {
                 testLogger(null), // NULL
                 testLogger(undefined), // Undefined
                 testLogger(''), // Empty
-                testLogger({ "test": "abc" }) // Object
+                testLogger({ "test": "abc" }), // Object
+                testLogger(fs.readFileSync(path.join(__dirname, 'sample-text.txt'))) // Long Object
             ]
             await sleep();
             const cnt = await connection.execute(`SELECT 1 FROM SYS_LOGS WHERE source = :1`, ["winston-oracle-testing"]);
