@@ -77,8 +77,10 @@ module.exports = class OracleTransport extends Transport {
                 return callback(error, null);
             }
             finally {
-                await connection.close();
-                connection = null;
+                if (connection) {
+                    await connection.close();
+                    connection = null;
+                }
             }
         });
     }
